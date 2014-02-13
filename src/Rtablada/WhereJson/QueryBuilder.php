@@ -1,5 +1,7 @@
 <?php namespace Rtablada\WhereJson;
 
+use Illuminate\Database\Query\Expression;
+
 class QueryBuilder extends \Illuminate\Database\Query\Builder {
 
 	public function whereJson($column, $columnTraverse, $operator = null, $value = null, $boolean = 'and')
@@ -12,6 +14,42 @@ class QueryBuilder extends \Illuminate\Database\Query\Builder {
 		}
 
 		return $this->whereRaw("{$column} {$operator} :value", compact('value'), $boolean);
+	}
+
+	public function select($columns = array('*'))
+	{
+		$columns = is_array($columns) ? $columns : func_get_args();
+
+		foreach ($columns as $key => $value) {
+			$columns[$key] = $this->prepareColumnValue($value);
+		}
+
+		$this->columns = $columns;
+
+		return $this;
+	}
+
+	protected function prepareColumnValue($value)
+	{
+		if (preg_match('/->/', $value)) {
+			$phrases = explode(' ', $value);
+
+			foreach ($phrases as $key => $phrase) {
+				$pieces = explode('->', $phrase);
+
+				$i = 1;
+
+				for ($i; $i < count($pieces); $i++) {
+					$pieces[$i] = "'{$pieces[$i]}'";
+				}
+
+				$phrases[$key] = implode('->', $pieces);
+			}
+
+			return new Expression(implode(' ', $phrases));
+		}
+
+		return $value;
 	}
 
 	protected function buildColumn($column, $columnTraverse)

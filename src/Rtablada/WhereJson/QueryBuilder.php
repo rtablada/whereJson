@@ -16,6 +16,8 @@ class QueryBuilder extends \Illuminate\Database\Query\Builder {
 
 	protected function buildColumn($column, $columnTraverse)
 	{
+		$columnTraverse = explode('->', $columnTraverse);
+
 		if (is_array($columnTraverse)) {
 			foreach ($columnTraverse as $property) {
 				$column = "{$column}->'{$property}'";
@@ -23,7 +25,7 @@ class QueryBuilder extends \Illuminate\Database\Query\Builder {
 
 			return $this->replaceLastInstanceInString('->', '->>', $column);
 		} else {
-			return $this->replaceLastInstanceInString('->', '->>', "{$column}->>'{$columnTraverse}'");
+			return "{$column}->>'{$columnTraverse}'";
 		}
 	}
 

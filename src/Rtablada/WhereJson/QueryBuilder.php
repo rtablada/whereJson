@@ -23,7 +23,7 @@ class QueryBuilder extends \Illuminate\Database\Query\Builder {
 
 			return $this->replaceLastInstanceInString('->', '->>', $column);
 		} else {
-			return "{$column}->>'{$columnTraverse}'";
+			return $this->replaceLastInstanceInString('->', '->>', "{$column}->>'{$columnTraverse}'");
 		}
 	}
 

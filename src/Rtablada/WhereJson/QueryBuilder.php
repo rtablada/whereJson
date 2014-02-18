@@ -34,6 +34,19 @@ class QueryBuilder extends \Illuminate\Database\Query\Builder {
 		return $this;
 	}
 
+	public function andSelect($columns = array('*'))
+	{
+		$columns = is_array($columns) ? $columns : func_get_args();
+
+		foreach ($columns as $key => $value) {
+			$columns[$key] = $this->prepareColumnValue($value);
+		}
+
+		$this->columns = array_merge($this->columns, $columns);
+
+		return $this;
+	}
+
 	protected function prepareColumnValue($value)
 	{
 		if (preg_match('/->/', $value)) {

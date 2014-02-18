@@ -13,7 +13,12 @@ class QueryBuilder extends \Illuminate\Database\Query\Builder {
 			$operator = '=';
 		}
 
-		return $this->whereRaw("{$column} {$operator} :value", compact('value'), $boolean);
+		return $this->whereRaw("{$column} {$operator} :?", [$value], $boolean);
+	}
+	
+	public function orWhereJson($column, $columnTraverse, $operator = null, $value = null)
+	{
+		return $this->whereJson($column, $columnTraverse, $operator, $value, 'or');
 	}
 
 	public function select($columns = array('*'))

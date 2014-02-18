@@ -1,6 +1,6 @@
 <?php namespace Rtablada\WhereJson;
 
-trait JsonModel {
+trait JsonModelTrait {
 
 	/**
 	 * Get a new query builder instance for the connection.

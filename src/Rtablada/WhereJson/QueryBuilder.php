@@ -15,7 +15,7 @@ class QueryBuilder extends \Illuminate\Database\Query\Builder {
 
 		return $this->whereRaw("{$column} {$operator} ?", [$value], $boolean);
 	}
-	
+
 	public function orWhereJson($column, $columnTraverse, $operator = null, $value = null)
 	{
 		return $this->whereJson($column, $columnTraverse, $operator, $value, 'or');
@@ -95,6 +95,16 @@ class QueryBuilder extends \Illuminate\Database\Query\Builder {
 		}
 
 		return $subject;
+	}
+
+	/**
+	 * Get a new instance of the query builder.
+	 *
+	 * @return \Illuminate\Database\Query\Builder
+	 */
+	public function newQuery()
+	{
+		return new static($this->connection, $this->grammar, $this->processor);
 	}
 
 }

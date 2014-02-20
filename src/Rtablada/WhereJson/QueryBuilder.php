@@ -4,9 +4,9 @@ use Illuminate\Database\Query\Expression;
 
 class QueryBuilder extends \Illuminate\Database\Query\Builder {
 
-	public function whereJson($column, $columnTraverse, $operator = null, $value = null, $boolean = 'and')
+	public function whereJson($column, $columnTraverse, $operator = null, $value = null, $boolean = 'and', $castType = null)
 	{
-		$column = $this->buildColumn($column, $columnTraverse);
+		$column = $this->buildColumn($column, $columnTraverse, $castType);
 
 		if (!$value) {
 			$value = $operator;
@@ -16,9 +16,9 @@ class QueryBuilder extends \Illuminate\Database\Query\Builder {
 		return $this->whereRaw("{$column} {$operator} ?", [$value], $boolean);
 	}
 
-	public function orWhereJson($column, $columnTraverse, $operator = null, $value = null)
+	public function orWhereJson($column, $columnTraverse, $operator = null, $value = null, $castType)
 	{
-		return $this->whereJson($column, $columnTraverse, $operator, $value, 'or');
+		return $this->whereJson($column, $columnTraverse, $operator, $value, 'or', $castType);
 	}
 
 	public function select($columns = array('*'))
@@ -70,7 +70,7 @@ class QueryBuilder extends \Illuminate\Database\Query\Builder {
 		return $value;
 	}
 
-	protected function buildColumn($column, $columnTraverse)
+	protected function buildColumn($column, $columnTraverse, $castType)
 	{
 		$columnTraverse = explode('->', $columnTraverse);
 
@@ -79,10 +79,14 @@ class QueryBuilder extends \Illuminate\Database\Query\Builder {
 				$column = "{$column}->'{$property}'";
 			}
 
-			return $this->replaceLastInstanceInString('->', '->>', $column);
+			$column = $this->replaceLastInstanceInString('->', '->>', $column);
 		} else {
-			return "{$column}->>'{$columnTraverse}'";
+			$column = "{$column}->>'{$columnTraverse}'";
 		}
+
+		$column = $castType ? "({$column})::{$castType}" : $column;
+
+		return $column;
 	}
 
 	protected function replaceLastInstanceInString($search, $replace, $subject)
